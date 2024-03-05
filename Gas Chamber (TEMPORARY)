@@ -2083,7 +2083,7 @@ Gas.Ended:Connect(function()
 Gas:Destroy()
 end)
 game:GetService("Chat"):Chat(v.Character:FindFirstChild("Head"), "*Choked to death*", Enum.ChatColor.White)
-v.Character.Parent = workspace
+--v.Character.Parent = workspace
 v.Character:FindFirstChildOfClass("Humanoid"):Destroy()
 end
 end
