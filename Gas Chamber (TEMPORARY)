@@ -1956,7 +1956,7 @@ for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 if v.Character then
 if v.Character:FindFirstChild("HumanoidRootPart") then
 v.Character:FindFirstChild("HumanoidRootPart").CFrame = TeleportAll.CFrame
-workspace:FindFirstChild(v.Name).Parent = plrlist		
+--workspace:FindFirstChild(v.Name).Parent = plrlist		
 end
 for i,deputamadre in pairs(v.Character:GetChildren()) do
 if deputamadre:IsA("Shirt") then
@@ -2045,7 +2045,7 @@ ParticleEmitter7.Enabled = true
 ParticleEmitter8.Enabled = true
 for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 if v.Character then
-if v.Character.Parent == plrlist then
+if v.Character.Parent ~= plrlist then
 local Gas = Instance.new("Sound")
 Gas.Parent = Model0
 Gas.Volume = 1
@@ -2072,7 +2072,7 @@ ScreenText.Text = MurderText
 wait(9)
 for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 if v.Character then
-if v.Character.Parent == plrlist then
+if v.Character.Parent ~= plrlist then
 local Gas = Instance.new("Sound")
 Gas.Parent = Model0
 Gas.Volume = 1
