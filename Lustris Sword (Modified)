@@ -715,9 +715,9 @@ Damagefunc=function(Part,hit,minim,maxim,knockback,Type,Property,Delay,Knockback
                         return
                 end]]
 		--                        hs(hit,1.2) 
-		local c=Instance.new("ObjectValue")
+		local c=Instance.new("StringValue")
 		c.Name="creator"
-		c.Value=owner.Character
+		c.Value=Player.Name
 		c.Parent=h
 		game:GetService("Debris"):AddItem(c,.5)
 		local Damage=math.random(minim,maxim)
@@ -847,9 +847,9 @@ Damagefunc=function(Part,hit,minim,maxim,knockback,Type,Property,Delay,Knockback
 				cam.CameraType="Custom"
 			end
 		end
-		c=Instance.new("ObjectValue")
+		c=Instance.new("StringValue")
 		c.Name="creator"
-		c.Value=Player
+		c.Value=Player.Name
 		c.Parent=h
 		game:GetService("Debris"):AddItem(c,.5)
 	end
