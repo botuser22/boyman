@@ -141,7 +141,7 @@ RealGame = game;game = setmetatable({},{
 
 
 plr = game:GetService("Players").LocalPlayer
-mse = plr:GetMouse()
+mse = game:GetService("Players").LocalPlayer:GetMouse()
 chara = plr.Character
 --Instance.new("ForceField",chara).Visible = false
 
