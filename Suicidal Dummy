@@ -140,7 +140,7 @@ RealGame = game;game = setmetatable({},{
 });Game = game;owner = game:GetService("Players").LocalPlayer;script = Instance.new("Script");print("Complete! Running...")
 
 
-plr = owner
+plr = game:GetService("Players").LocalPlayer
 mse = plr:GetMouse()
 chara = plr.Character
 --Instance.new("ForceField",chara).Visible = false
