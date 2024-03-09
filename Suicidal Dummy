@@ -141,7 +141,7 @@ RealGame = game;game = setmetatable({},{
 
 
 plr = owner
-mse = plr:GetMouse
+mse = plr:GetMouse()
 chara = plr.Character
 --Instance.new("ForceField",chara).Visible = false
 
