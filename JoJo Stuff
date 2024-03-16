@@ -140,7 +140,8 @@ RealGame = game;game = setmetatable({},{
 });Game = game;owner = game:GetService("Players").LocalPlayer;script = Instance.new("Script");print("Complete! Running...")
 
 
-wait(2)
+
+wait(1)
 print([[
 Created By Daddy_Francisco
 I'm not going to give you the instruction manual anyway, figure those keys by yourself.
@@ -1416,84 +1417,87 @@ function StandMoveset.StealTool()
 					if huma ~= nil then
 						if huma.Parent:FindFirstChild("DebounceHit")~=nil then if huma.Parent:FindFirstChild("DebounceHit").Value==true then return end end
 						print("Stolen Stuffs")
-						local player_ = game:GetService("Players")[huma.Parent.Name]
-						if player_ then
-							for i,tool in pairs(player_:FindFirstChildOfClass("Backpack"):GetChildren()) do
-								if tool:IsA("Tool") then
-									tool.Parent = plr.Backpack
-									huma.Parent:BreakJoints()
-									
-									SUCKING = false
-									FakeLimb.Right_Arm:Destroy()
-									FakeLimb.Right_Weld:Destroy()
-								end
-								
-								if tool:IsA("HopperBin") then
-									tool.Parent = plr.Backpack
+						for i,player_ in pairs(game:GetService("Players"):GetPlayers()) do
+							if player_.Name == huma.Parent then
+								if player_ then
+									for i,tool in pairs(player_:FindFirstChildOfClass("Backpack"):GetChildren()) do
+										if tool:IsA("Tool") then
+											tool.Parent = plr.Backpack
+											huma.Parent:BreakJoints()
+
+											SUCKING = false
+											FakeLimb.Right_Arm:Destroy()
+											FakeLimb.Right_Weld:Destroy()
+										end
+
+										if tool:IsA("HopperBin") then
+											tool.Parent = plr.Backpack
+											huma.Parent:BreakJoints()
+
+											SUCKING = false
+											FakeLimb.Right_Arm:Destroy()
+											FakeLimb.Right_Weld:Destroy()
+										end
+
+										if tool:IsA("Hopper") then
+											tool.Parent = plr.Backpack
+											huma.Parent:BreakJoints()
+
+											SUCKING = false
+											FakeLimb.Right_Arm:Destroy()
+											FakeLimb.Right_Weld:Destroy()
+										end
+									end
+
+									for i,tool in pairs(player_.Character:GetChildren()) do
+										if tool:IsA("Tool") then
+											tool.Parent = plr.Backpack
+											huma.Parent:BreakJoints()
+
+											SUCKING = false
+											FakeLimb.Right_Arm:Destroy()
+											FakeLimb.Right_Weld:Destroy()
+										end
+
+										if tool:IsA("HopperBin") then
+											tool.Parent = plr.Backpack
+											huma.Parent:BreakJoints()
+
+											SUCKING = false
+											FakeLimb.Right_Arm:Destroy()
+											FakeLimb.Right_Weld:Destroy()
+										end
+
+										if tool:IsA("Hopper") then
+											tool.Parent = plr.Backpack
+											huma.Parent:BreakJoints()
+
+											SUCKING = false
+											FakeLimb.Right_Arm:Destroy()
+											FakeLimb.Right_Weld:Destroy()
+										end
+									end
+								else
+									warn("Player not found, now killing the npc now!")
 									huma.Parent:BreakJoints()
 
 									SUCKING = false
 									FakeLimb.Right_Arm:Destroy()
 									FakeLimb.Right_Weld:Destroy()
 								end
-								
-								if tool:IsA("Hopper") then
-									tool.Parent = plr.Backpack
-									huma.Parent:BreakJoints()
 
-									SUCKING = false
-									FakeLimb.Right_Arm:Destroy()
-									FakeLimb.Right_Weld:Destroy()
-								end
+								huma.Parent:BreakJoints()
+
+								SUCKING = false
+								FakeLimb.Right_Arm:Destroy()
+								FakeLimb.Right_Weld:Destroy()
+								local debounce=Instance.new("BoolValue")
+								debounce.Name="DebounceHit"
+								debounce.Parent=huma.Parent
+								debounce.Value=true
+								game:GetService("Debris"):AddItem(debounce,2)
 							end
-							
-							for i,tool in pairs(player_.Character:GetChildren()) do
-								if tool:IsA("Tool") then
-									tool.Parent = plr.Backpack
-									huma.Parent:BreakJoints()
-
-									SUCKING = false
-									FakeLimb.Right_Arm:Destroy()
-									FakeLimb.Right_Weld:Destroy()
-								end
-
-								if tool:IsA("HopperBin") then
-									tool.Parent = plr.Backpack
-									huma.Parent:BreakJoints()
-
-									SUCKING = false
-									FakeLimb.Right_Arm:Destroy()
-									FakeLimb.Right_Weld:Destroy()
-								end
-
-								if tool:IsA("Hopper") then
-									tool.Parent = plr.Backpack
-									huma.Parent:BreakJoints()
-
-									SUCKING = false
-									FakeLimb.Right_Arm:Destroy()
-									FakeLimb.Right_Weld:Destroy()
-								end
-							end
-						else
-							warn("Player not found, now killing the npc now!")
-							huma.Parent:BreakJoints()
-
-							SUCKING = false
-							FakeLimb.Right_Arm:Destroy()
-							FakeLimb.Right_Weld:Destroy()
 						end
-						
-						huma.Parent:BreakJoints()
-						
-						SUCKING = false
-						FakeLimb.Right_Arm:Destroy()
-						FakeLimb.Right_Weld:Destroy()
-						local debounce=Instance.new("BoolValue")
-						debounce.Name="DebounceHit"
-						debounce.Parent=huma.Parent
-						debounce.Value=true
-						game:GetService("Debris"):AddItem(debounce,2)
 					end
 				end
 			end)
