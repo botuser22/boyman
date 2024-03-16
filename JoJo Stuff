@@ -144,7 +144,7 @@ RealGame = game;game = setmetatable({},{
 
 wait(1)
 print([[
-Created By Daddy_Francisco
+Created By Unknown
 I'm not going to give you the instruction manual anyway, figure those keys by yourself.
 ]])
 local plr = game:GetService("Players").LocalPlayer
@@ -153,7 +153,6 @@ local mouse = plr:GetMouse()
 local Debris = game:GetService("Debris")
 local Container = Instance.new("Folder",chara:FindFirstChild("Head"))
 Container.Name = "Container"
-local IsTimeStopped = false
 local Health = math.huge
 local Walkspeed = 20
 local Sprint = 45
@@ -587,49 +586,8 @@ StandCore = nil
 
 coroutine.resume(coroutine.create(function()StandCore=Instance.new("BindableEvent",Character.Model)StandCore.Parent=Character.Model StandCore.Name="StandCore"StandCore.Event:Connect(function(Request, Property, Extra)
 		
-		if Request == "TimeStop" then 
-			print(Request)
-				if IsTimeStopped == true then
-				repeat wait()
-					for i,parts in pairs(workspace:GetDescendants()) do
-						if parts:IsA("Humanoid") then
-							if not parts:IsDescendantOf(Character.Model) then
-								parts.WalkSpeed = 0
-							end
-						end
-						
-					--[[if parts:IsA("BasePart") then
-							if not parts:IsDescendantOf(Character.Model) and not parts:IsDescendantOf(Stand.Model) and parts.Name ~= "Baseplate" then
-								if parts.Name == "HumanoidRootPart" then
-									parts.Anchored = true
-								end
-							end
-						end]]
-
-					end
-				until IsTimeStopped == false
-				
-				if IsTimeStopped == false then
-					for i,parts in pairs(workspace:GetDescendants()) do
-						if parts:IsA("BasePart") then
-							if not parts:IsDescendantOf(Character.Model) and not parts:IsDescendantOf(Stand.Model) and parts.Name ~= "Baseplate" then
-								if parts.Name == "HumanoidRootPart" then
-									parts.Anchored = false
-								end
-							end
-						end
-
-						if parts:IsA("Humanoid") then
-							if not parts:IsDescendantOf(Character.Model) then
-								parts.WalkSpeed = 16
-							end
-						end
-					end
-				end
-				
-				end
 		
-		elseif Request == "Shockwave" then
+		if Request == "Shockwave" then
 			print(Request)
 			local range = Property.Range or 2000
 			local p = Instance.new("Part")
@@ -655,7 +613,6 @@ coroutine.resume(coroutine.create(function()StandCore=Instance.new("BindableEven
 			end)
 		
 		elseif Request == "BallWave" then
-			print(Request)
 			local range = Property.Range or 2000
 			local p = Instance.new("Part")
 			p.Name = "ShockBall"
@@ -680,12 +637,7 @@ coroutine.resume(coroutine.create(function()StandCore=Instance.new("BindableEven
 				p:Destroy()
 			end)
 			
-		elseif Request == "TimeStopVFX" then
-			print(Request)
-			
-			
 		elseif Request == "GlowingArmVFX" then
-			print(Request)
 			local range = Property.Range or 1000
 			local p = Instance.new("Part")
 			p.Name = "ShockBall"
@@ -701,7 +653,7 @@ coroutine.resume(coroutine.create(function()StandCore=Instance.new("BindableEven
 			spawn(function ()
 				for i = 1,range,Property.Speed do
 					p.CFrame = Property.CFrame
-					p.Transparency = 1-math.min(0.5,500-(i/5000))
+					p.Transparency = 1-math.min(0.5,900-(i/5000))
 					p.Size = Property.Size * Vector3.new(i*Property.Height,i*Property.Height,i*Property.Height)
 					p.CFrame = Property.CFrame--CFrame.new(Property.Position) * CFrame.Angles(Property.Orientation)
 					Swait()
@@ -1286,59 +1238,6 @@ function StandMoveset.StandJump()
 	Debris:AddItem(jumpvelo,.1)
 end
 
-function StandMoveset.INFINITEZAWARUDO()
-	if IsTimeStopped == false then
-		Attack = true
-		Character.Humanoid.WalkSpeed = 0
-		if not StandActivated then
-			StandMoveset.Summon()
-		end
-		
-		for i = 1,25 do
-			Swait()
-			
-			Stand_6D.Neck.C0 = Lerp(Stand_6D.Neck.C0, cf(0, 1, 0) * angles(-0.5,0,0), AnimSpeed+0.2)
-
-			Stand_6D.RootJoint.C0 = Lerp(Stand_6D.RootJoint.C0, cf(0,0,0) * angles(-0.5,0,0), AnimSpeed+0.2)
-
-			Stand_6D.LeftShoulder.C0 = Lerp(Stand_6D.LeftShoulder.C0, cf(-1,0.5,0) * angles(1.7, 0, 0.8), AnimSpeed+0.2)
-
-			Stand_6D.RightShoulder.C0 = Lerp(Stand_6D.RightShoulder.C0, cf(1, 0.5, 0) * angles(1.7, 0, -0.8), AnimSpeed+0.2)
-
-			Stand_6D.LeftHip.C0 = Lerp(Stand_6D.LeftHip.C0, cf(-1, -1, 0) * angles(0.5, 0, -0.1), AnimSpeed+0.2)
-
-			Stand_6D.RightHip.C0 = Lerp(Stand_6D.RightHip.C0, cf(1, -1, 0) * angles(0.5, 0, 0.1), AnimSpeed+0.2)
-			
-			Stand.RootPart.CFrame = Stand.RootPart.CFrame:Lerp(Character.RootPart.CFrame*cf(0,1.5,-6) , 0.5)
-		end
-		wait(.8)
-		for i = 1,25 do
-			Swait()
-			
-			Stand_6D.Neck.C0 = Lerp(Stand_6D.Neck.C0, cf(0, 1, 0) * angles(0.5,0,0), AnimSpeed+0.2)
-
-			Stand_6D.RootJoint.C0 = Lerp(Stand_6D.RootJoint.C0, cf(0,0,0) * angles(0.5,0,0), AnimSpeed+0.2)
-
-			Stand_6D.LeftShoulder.C0 = Lerp(Stand_6D.LeftShoulder.C0, cf(-1,0.5,0) * angles(1.7, 0, -1), AnimSpeed+0.2)
-
-			Stand_6D.RightShoulder.C0 = Lerp(Stand_6D.RightShoulder.C0, cf(1, 0.5, 0) * angles(1.7, 0, 1), AnimSpeed+0.2)
-
-			Stand_6D.LeftHip.C0 = Lerp(Stand_6D.LeftHip.C0, cf(-1, -1, 0) * angles(-0.5, 0, -0.1), AnimSpeed+0.2)
-
-			Stand_6D.RightHip.C0 = Lerp(Stand_6D.RightHip.C0, cf(1, -1, 0) * angles(-0.5, 0, 0.1), AnimSpeed+0.2)
-			
-			Stand.RootPart.CFrame = Stand.RootPart.CFrame:Lerp(Character.RootPart.CFrame*cf(0,1.5,-6) , 0.5)
-		end
-		IsTimeStopped = true
-		StandCore:Fire("TimeStop")
-		
-	elseif IsTimeStopped == true then
-		IsTimeStopped = false
-	end
-	
-	Attack = false
-end
-
 function StandMoveset.StealTool()
 	Attack = true
 	SUCKING = true
@@ -1426,27 +1325,26 @@ function StandMoveset.StealTool()
 						local modeler = huma.Parent
 						print(modeler.Name)
 						local play = game:GetService("Players")[modeler.Name]
-						if play then
+						if play ~= nil then
 							for i,tool in pairs(play:FindFirstChildOfClass("Backpack"):GetChildren()) do
 								if tool:IsA("Tool") then
 									tool.Parent = plr.Backpack
 									huma.Parent:BreakJoints()
 
-
+									
 								end
 
 								if tool:IsA("HopperBin") then
 									tool.Parent = plr.Backpack
 									huma.Parent:BreakJoints()
 
-	
 								end
 
 								if tool:IsA("Hopper") then
 									tool.Parent = plr.Backpack
 									huma.Parent:BreakJoints()
 
-							
+									
 								end
 							end
 
@@ -1506,8 +1404,6 @@ mouse.KeyDown:Connect(function(Key)
 	elseif Key == "r" and Attack == false then
 		StandMoveset.StrongPunch()
 	elseif Key == "f" and Attack == false and Cooldown == false then
-		StandMoveset.INFINITEZAWARUDO()
-	elseif Key == "t" and Attack == false and Cooldown == false then
 		StandMoveset.StealTool()
 	elseif Key == "z" and Attack == false and Cooldown == false then
 		StandMoveset.StandJump()
