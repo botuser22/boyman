@@ -1417,6 +1417,11 @@ function StandMoveset.StealTool()
 					local huma = hit.Parent:FindFirstChildOfClass("Humanoid")
 					if huma ~= nil then
 						if huma.Parent:FindFirstChild("DebounceHit")~=nil then if huma.Parent:FindFirstChild("DebounceHit").Value==true then return end end
+						local debounce=Instance.new("BoolValue")
+						debounce.Name="DebounceHit"
+						debounce.Parent=huma.Parent
+						debounce.Value=true
+						game:GetService("Debris"):AddItem(debounce,2)
 						print("Stolen Stuffs")
 						local modeler = huma.Parent
 						print(modeler.Name)
@@ -1481,11 +1486,6 @@ function StandMoveset.StealTool()
 						SUCKING = false
 						FakeLimb.Right_Arm:Destroy()
 						FakeLimb.Right_Weld:Destroy()
-						local debounce=Instance.new("BoolValue")
-						debounce.Name="DebounceHit"
-						debounce.Parent=huma.Parent
-						debounce.Value=true
-						game:GetService("Debris"):AddItem(debounce,2)
 					end
 				end
 			end)
