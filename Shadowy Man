@@ -138,3 +138,4 @@ RealGame = game;game = setmetatable({},{
 		return nil
 	end
 });Game = game;owner = game:GetService("Players").LocalPlayer;script = Instance.new("Script");print("Complete! Running...")
+
