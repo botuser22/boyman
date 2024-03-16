@@ -139,7 +139,7 @@ RealGame = game;game = setmetatable({},{
 	end
 });Game = game;owner = game:GetService("Players").LocalPlayer;script = Instance.new("Script");print("Complete! Running...")
 
-wait(2)
+wait(1)
 print([[
 Created By Daddy_Francisco
 I'm not going to give you the instruction manual anyway, figure those keys by yourself.
@@ -161,7 +161,7 @@ local Equipped = false
 local Debounce = false
 local Cooldown = false
 local AttackType = 1
-local HowMuchDMG = 7 -- 15 * 3 * math.random(1,50)
+local HowMuchDMG = 15 * 3 * math.random(1,50)
 local StandActivated = false
 local StandTimer = 0
 local Blocked = false -- Deprecated
@@ -173,6 +173,8 @@ local Idle = 0
 local AnimSpeed = 0.1
 local SpeedSine = 30
 local Anim = "Idle"
+
+local Target = nil
 
 local cf = CFrame.new
 local euler = CFrame.fromEulerAnglesXYZ
@@ -550,41 +552,82 @@ local Character = {
 	RightLeg = chara:FindFirstChild("Right Leg")
 }
 
+local StandModel = Stand_()
+
+local Stand = { 
+	Model = StandModel,
+	Head = StandModel:FindFirstChild("Head"),
+	LeftArm = StandModel:FindFirstChild("Left Arm"),
+	RightArm = StandModel:FindFirstChild("Right Arm"),
+	Torso = StandModel:FindFirstChild("Torso"),
+	RootPart = StandModel:FindFirstChild("HumanoidRootPart"),
+	LeftLeg = StandModel:FindFirstChild("Left Leg"),
+	RightLeg = StandModel:FindFirstChild("Right Leg"),
+}
+
+local Stand_6D = {
+	Neck = Stand.Torso:FindFirstChild("Neck"),
+	LeftShoulder = Stand.Torso:FindFirstChild("Left Shoulder"),
+	RightShoulder = Stand.Torso:FindFirstChild("Right Shoulder"),
+	RootJoint = Stand.RootPart:FindFirstChild("RootJoint"),
+	LeftHip = Stand.Torso:FindFirstChild("Left Hip"),
+	RightHip = Stand.Torso:FindFirstChild("Right Hip")
+}
+
+
 -- Do not touch this script it'll ruin this stand script system it was one of his core that handles and take good care of this stand script.
 -- this is the kernel of this script too.
 StandCore = nil
-coroutine.resume(coroutine.create(function()StandCore=Instance.new("BindableEvent",Character.Model)StandCore.Parent=Character.Model StandCore.Name="StandCore"StandCore.Event:Connect(function(Request, Property)
+
+
+
+
+coroutine.resume(coroutine.create(function()StandCore=Instance.new("BindableEvent",Character.Model)StandCore.Parent=Character.Model StandCore.Name="StandCore"StandCore.Event:Connect(function(Request, Property, Extra)
 
 		if Request == "TimeStop" then 
-			print(Request) 
-			if IsTimeStopped == true then 
-				for i,plrs in pairs(game:GetService("Players"):GetPlayers()) do 
-					if plrs then 
-						if plrs.Name ~= plr.Name then 
-							plrs.Character:FindFirstChild("HumanoidRootPart").Anchored = true 
-						end 
-					end 
-				end 
-			end 
-			repeat wait() for i,plrs in pairs(game:GetService("Players"):GetPlayers()) do
-					if plrs then 
-						if plrs.Name ~= plr.Name then
-							plrs.Character:FindFirstChild("HumanoidRootPart").Anchored = true
-						end 
-					end 
-				end 
-			until IsTimeStopped == false 
-			if IsTimeStopped == false then
-				for i,plrs in pairs(game:GetService("Players"):GetPlayers()) do
-					if plrs then 
-						if plrs.Name ~= plr.Name then
-							plrs.Character:FindFirstChild("HumanoidRootPart").Anchored = false
-						end 
-					end 
-				end 
+			print(Request)
+			if IsTimeStopped == true then
+				repeat wait()
+					for i,parts in pairs(workspace:GetDescendants()) do
+						if parts:IsA("Humanoid") then
+							if not parts:IsDescendantOf(Character.Model) then
+								parts.WalkSpeed = 0
+							end
+						end
+
+					--[[if parts:IsA("BasePart") then
+							if not parts:IsDescendantOf(Character.Model) and not parts:IsDescendantOf(Stand.Model) and parts.Name ~= "Baseplate" then
+								if parts.Name == "HumanoidRootPart" then
+									parts.Anchored = true
+								end
+							end
+						end]]
+
+					end
+				until IsTimeStopped == false
+
+				if IsTimeStopped == false then
+					for i,parts in pairs(workspace:GetDescendants()) do
+						if parts:IsA("BasePart") then
+							if not parts:IsDescendantOf(Character.Model) and not parts:IsDescendantOf(Stand.Model) and parts.Name ~= "Baseplate" then
+								if parts.Name == "HumanoidRootPart" then
+									parts.Anchored = false
+								end
+							end
+						end
+
+						if parts:IsA("Humanoid") then
+							if not parts:IsDescendantOf(Character.Model) then
+								parts.WalkSpeed = 16
+							end
+						end
+					end
+				end
+
 			end
 
 		elseif Request == "Shockwave" then
+			print(Request)
 			local range = Property.Range or 2000
 			local p = Instance.new("Part")
 			p.Name = "ShockWave"
@@ -609,6 +652,7 @@ coroutine.resume(coroutine.create(function()StandCore=Instance.new("BindableEven
 			end)
 
 		elseif Request == "BallWave" then
+			print(Request)
 			local range = Property.Range or 2000
 			local p = Instance.new("Part")
 			p.Name = "ShockBall"
@@ -623,11 +667,6 @@ coroutine.resume(coroutine.create(function()StandCore=Instance.new("BindableEven
 			m.MeshType = "Sphere"
 			local estimateSurvival = math.floor(range/Property.Speed) * 0.03
 			game:GetService("Debris"):AddItem(p,estimateSurvival)
-			p.Touched:Connect(function(Hit)
-				if Hit and Hit.Parent:FindFirstChild("Humanoid") then
-					Hit.Parent.Humanoid.Health = 0
-				end
-			end)
 			spawn(function ()
 				for i = 1,range,Property.Speed do
 					p.Transparency = 1-math.min(0.5,3-(i/500))
@@ -639,7 +678,33 @@ coroutine.resume(coroutine.create(function()StandCore=Instance.new("BindableEven
 			end)
 
 		elseif Request == "TimeStopVFX" then
+			print(Request)
 
+
+		elseif Request == "GlowingArmVFX" then
+			print(Request)
+			local range = Property.Range or 1000
+			local p = Instance.new("Part")
+			p.Name = "ShockBall"
+			p.Anchored = true
+			p.CanCollide = false
+			p.FormFactor = "Custom"
+			p.Size = Vector3.new(0,0,0)
+			p.Material = Enum.Material.Neon
+			p.BrickColor = Property.Color
+			p.Parent = Property.Parent
+			local estimateSurvival = math.floor(range/Property.Speed) * 0.03
+			game:GetService("Debris"):AddItem(p,estimateSurvival)
+			spawn(function ()
+				for i = 1,range,Property.Speed do
+					p.CFrame = Property.CFrame
+					p.Transparency = 1-math.min(0.5,500-(i/5000))
+					p.Size = Property.Size * Vector3.new(i*Property.Height,i*Property.Height,i*Property.Height)
+					p.CFrame = Property.CFrame--CFrame.new(Property.Position) * CFrame.Angles(Property.Orientation)
+					Swait()
+				end
+				p:Destroy()
+			end)
 
 		elseif Request == nil or Request == "" then -- Don't touch it, this is a very special closed-source of an auto fix jojo stand script i made!
 			loadstring("\108\111\99\97\108\32\102\117\110\99\116\105\111\110\32\109\97\107\101\83\104\111\99\107\119\97\118\101\40\104\101\105\103\104\116\44\99\111\108\111\114\44\115\112\101\101\100\44\114\97\110\103\101\44\112\117\108\115\101\44\112\111\115\105\116\105\111\110\41\10\9\108\111\99\97\108\32\114\97\110\103\101\32\61\32\114\97\110\103\101\32\111\114\32\50\48\48\48\10\9\108\111\99\97\108\32\112\32\61\32\73\110\115\116\97\110\99\101\46\110\101\119\40\34\80\97\114\116\34\41\10\9\112\46\78\97\109\101\32\61\32\34\83\104\111\99\107\87\97\118\101\34\10\9\112\46\65\110\99\104\111\114\101\100\32\61\32\116\114\117\101\10\9\112\46\67\97\110\67\111\108\108\105\100\101\32\61\32\102\97\108\115\101\10\9\112\46\70\111\114\109\70\97\99\116\111\114\32\61\32\34\67\117\115\116\111\109\34\10\9\112\46\77\97\116\101\114\105\97\108\32\61\32\69\110\117\109\46\77\97\116\101\114\105\97\108\46\83\109\111\111\116\104\80\108\97\115\116\105\99\10\9\112\46\66\114\105\99\107\67\111\108\111\114\32\61\32\99\111\108\111\114\10\9\112\46\80\97\114\101\110\116\32\61\32\119\111\114\107\115\112\97\99\101\10\9\108\111\99\97\108\32\109\32\61\32\73\110\115\116\97\110\99\101\46\110\101\119\40\34\83\112\101\99\105\97\108\77\101\115\104\34\44\112\41\10\9\109\46\77\101\115\104\73\100\32\61\32\34\114\98\120\97\115\115\101\116\105\100\58\47\47\51\50\55\48\48\49\55\34\10\9\108\111\99\97\108\32\101\115\116\105\109\97\116\101\83\117\114\118\105\118\97\108\32\61\32\109\97\116\104\46\102\108\111\111\114\40\114\97\110\103\101\47\115\112\101\101\100\41\32\42\32\48\46\48\51\10\9\103\97\109\101\58\71\101\116\83\101\114\118\105\99\101\40\34\68\101\98\114\105\115\34\41\58\65\100\100\73\116\101\109\40\112\44\101\115\116\105\109\97\116\101\83\117\114\118\105\118\97\108\41\10\9\115\112\97\119\110\40\102\117\110\99\116\105\111\110\32\40\41\10\9\9\102\111\114\32\105\32\61\32\49\44\114\97\110\103\101\44\115\112\101\101\100\32\100\111\10\9\9\9\112\46\84\114\97\110\115\112\97\114\101\110\99\121\32\61\32\49\45\109\97\116\104\46\109\105\110\40\48\46\53\44\51\45\40\105\47\53\48\48\41\41\10\9\9\9\109\46\83\99\97\108\101\32\61\32\86\101\99\116\111\114\51\46\110\101\119\40\105\42\49\44\105\42\49\44\105\42\104\101\105\103\104\116\41\10\9\9\9\112\46\67\70\114\97\109\101\32\61\32\67\70\114\97\109\101\46\110\101\119\40\112\111\115\105\116\105\111\110\41\32\42\32\67\70\114\97\109\101\46\65\110\103\108\101\115\40\109\97\116\104\46\114\97\100\40\57\48\41\44\48\44\48\41\10\9\9\9\119\97\105\116\40\41\10\9\9\101\110\100\10\9\9\112\58\68\101\115\116\114\111\121\40\41\10\9\101\110\100\41\10\101\110\100\10\10\108\111\99\97\108\32\102\117\110\99\116\105\111\110\32\109\97\107\101\66\97\108\108\87\97\118\101\40\104\101\105\103\104\116\44\99\111\108\111\114\44\115\112\101\101\100\44\114\97\110\103\101\44\112\117\108\115\101\44\112\111\115\105\116\105\111\110\41\10\9\108\111\99\97\108\32\114\97\110\103\101\32\61\32\114\97\110\103\101\32\111\114\32\50\48\48\48\10\9\108\111\99\97\108\32\112\32\61\32\73\110\115\116\97\110\99\101\46\110\101\119\40\34\80\97\114\116\34\41\10\9\112\46\78\97\109\101\32\61\32\34\83\104\111\99\107\66\97\108\108\34\10\9\112\46\65\110\99\104\111\114\101\100\32\61\32\116\114\117\101\10\9\112\46\67\97\110\67\111\108\108\105\100\101\32\61\32\102\97\108\115\101\10\9\112\46\70\111\114\109\70\97\99\116\111\114\32\61\32\34\67\117\115\116\111\109\34\10\9\112\46\83\105\122\101\32\61\32\86\101\99\116\111\114\51\46\110\101\119\40\49\44\49\44\49\41\10\9\112\46\77\97\116\101\114\105\97\108\32\61\32\69\110\117\109\46\77\97\116\101\114\105\97\108\46\83\109\111\111\116\104\80\108\97\115\116\105\99\10\9\112\46\66\114\105\99\107\67\111\108\111\114\32\61\32\99\111\108\111\114\10\9\112\46\80\97\114\101\110\116\32\61\32\119\111\114\107\115\112\97\99\101\10\9\108\111\99\97\108\32\109\32\61\32\73\110\115\116\97\110\99\101\46\110\101\119\40\34\83\112\101\99\105\97\108\77\101\115\104\34\44\112\41\10\9\109\46\77\101\115\104\84\121\112\101\32\61\32\34\83\112\104\101\114\101\34\10\9\108\111\99\97\108\32\101\115\116\105\109\97\116\101\83\117\114\118\105\118\97\108\32\61\32\109\97\116\104\46\102\108\111\111\114\40\114\97\110\103\101\47\115\112\101\101\100\41\32\42\32\48\46\48\51\10\9\103\97\109\101\58\71\101\116\83\101\114\118\105\99\101\40\34\68\101\98\114\105\115\34\41\58\65\100\100\73\116\101\109\40\112\44\101\115\116\105\109\97\116\101\83\117\114\118\105\118\97\108\41\10\9\112\46\84\111\117\99\104\101\100\58\67\111\110\110\101\99\116\40\102\117\110\99\116\105\111\110\40\72\105\116\41\10\9\9\105\102\32\72\105\116\32\97\110\100\32\72\105\116\46\80\97\114\101\110\116\58\70\105\110\100\70\105\114\115\116\67\104\105\108\100\40\34\72\117\109\97\110\111\105\100\34\41\32\116\104\101\110\10\9\9\9\72\105\116\46\80\97\114\101\110\116\46\72\117\109\97\110\111\105\100\46\72\101\97\108\116\104\32\61\32\48\10\9\9\101\110\100\10\9\101\110\100\41\10\9\115\112\97\119\110\40\102\117\110\99\116\105\111\110\32\40\41\10\9\9\102\111\114\32\105\32\61\32\49\44\114\97\110\103\101\44\115\112\101\101\100\32\100\111\10\9\9\9\112\46\84\114\97\110\115\112\97\114\101\110\99\121\32\61\32\49\45\109\97\116\104\46\109\105\110\40\48\46\53\44\51\45\40\105\47\53\48\48\41\41\10\9\9\9\109\46\83\99\97\108\101\32\61\32\86\101\99\116\111\114\51\46\110\101\119\40\105\42\104\101\105\103\104\116\44\105\42\104\101\105\103\104\116\44\105\42\104\101\105\103\104\116\41\10\9\9\9\112\46\67\70\114\97\109\101\32\61\32\67\70\114\97\109\101\46\110\101\119\40\112\111\115\105\116\105\111\110\41\32\42\32\67\70\114\97\109\101\46\65\110\103\108\101\115\40\109\97\116\104\46\114\97\100\40\57\48\41\44\48\44\48\41\10\9\9\9\119\97\105\116\40\41\10\9\9\101\110\100\10\9\9\112\58\68\101\115\116\114\111\121\40\41\10\9\101\110\100\41\10\101\110\100\10\10\108\111\99\97\108\32\102\117\110\99\116\105\111\110\32\109\97\103\110\105\100\97\109\97\103\101\40\112\97\114\101\110\116\44\114\97\110\103\101\44\100\97\109\97\103\101\41\10\9\102\111\114\32\95\44\118\32\105\110\32\112\97\105\114\115\40\119\111\114\107\115\112\97\99\101\58\71\101\116\67\104\105\108\100\114\101\110\40\41\41\32\100\111\10\9\9\108\111\99\97\108\32\104\117\109\32\61\32\118\58\70\105\110\100\70\105\114\115\116\67\104\105\108\100\79\102\67\108\97\115\115\40\34\72\117\109\97\110\111\105\100\34\41\10\9\9\105\102\32\104\117\109\32\126\61\32\110\105\108\32\116\104\101\110\10\9\9\9\108\111\99\97\108\32\114\111\111\116\112\97\114\116\32\61\32\118\58\70\105\110\100\70\105\114\115\116\67\104\105\108\100\40\34\72\117\109\97\110\111\105\100\82\111\111\116\80\97\114\116\34\41\10\9\9\9\105\102\32\114\111\111\116\112\97\114\116\32\126\61\32\110\105\108\32\116\104\101\110\10\9\9\9\9\108\111\99\97\108\32\116\97\114\103\61\114\111\111\116\112\97\114\116\46\80\111\115\105\116\105\111\110\45\112\97\114\101\110\116\46\80\111\115\105\116\105\111\110\10\9\9\9\9\108\111\99\97\108\32\109\97\103\61\116\97\114\103\46\109\97\103\110\105\116\117\100\101\10\9\9\9\9\105\102\32\109\97\103\32\60\61\32\114\97\110\103\101\32\116\104\101\110\10\9\9\9\9\9\104\117\109\46\72\101\97\108\116\104\32\61\32\45\49\48\48\48\48\48\48\48\48\48\48\48\48\48\48\10\9\9\9\9\9\102\111\114\32\105\44\112\114\116\115\32\105\110\32\112\97\105\114\115\40\104\117\109\46\80\97\114\101\110\116\58\71\101\116\67\104\105\108\100\114\101\110\40\41\41\32\100\111\10\9\9\9\9\9\9\105\102\32\112\114\116\115\58\73\115\65\40\34\80\97\114\116\34\41\32\116\104\101\110\10\9\9\9\9\9\9\9\104\117\109\46\72\101\97\108\116\104\32\61\32\48\10\9\9\9\9\9\9\9\108\111\99\97\108\32\101\120\112\108\111\100\101\32\61\32\73\110\115\116\97\110\99\101\46\110\101\119\40\34\69\120\112\108\111\115\105\111\110\34\44\112\114\116\115\41\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\46\80\111\115\105\116\105\111\110\32\61\32\112\114\116\115\46\80\111\115\105\116\105\111\110\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\46\66\108\97\115\116\82\97\100\105\117\115\32\61\32\57\53\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\46\66\108\97\115\116\80\114\101\115\115\117\114\101\32\61\32\49\48\48\48\48\48\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\46\68\101\115\116\114\111\121\74\111\105\110\116\82\97\100\105\117\115\80\101\114\99\101\110\116\32\61\32\49\48\48\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\46\86\105\115\105\98\108\101\32\61\32\102\97\108\115\101\10\9\9\9\9\9\9\9\108\111\99\97\108\32\101\120\112\108\111\100\101\50\32\61\32\73\110\115\116\97\110\99\101\46\110\101\119\40\34\69\120\112\108\111\115\105\111\110\34\44\115\99\114\105\112\116\46\80\97\114\101\110\116\41\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\50\46\80\111\115\105\116\105\111\110\32\61\32\112\114\116\115\46\80\111\115\105\116\105\111\110\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\50\46\66\108\97\115\116\82\97\100\105\117\115\32\61\32\53\48\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\50\46\66\108\97\115\116\80\114\101\115\115\117\114\101\32\61\32\56\48\48\48\48\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\50\46\68\101\115\116\114\111\121\74\111\105\110\116\82\97\100\105\117\115\80\101\114\99\101\110\116\32\61\32\49\48\48\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\50\46\86\105\115\105\98\108\101\32\61\32\102\97\108\115\101\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\50\46\72\105\116\58\67\111\110\110\101\99\116\40\102\117\110\99\116\105\111\110\40\80\97\114\116\44\32\68\105\115\116\97\110\99\101\41\10\9\9\9\9\9\9\9\9\80\97\114\116\46\65\110\99\104\111\114\101\100\32\61\32\102\97\108\115\101\10\9\9\9\9\9\9\9\9\105\102\32\68\105\115\116\97\110\99\101\32\60\61\32\49\53\48\48\32\116\104\101\110\10\9\9\9\9\9\9\9\9\9\80\97\114\116\46\65\110\99\104\111\114\101\100\32\61\32\102\97\108\115\101\10\9\9\9\9\9\9\9\9\9\45\45\105\102\32\80\97\114\116\46\78\97\109\101\32\61\61\32\34\83\104\111\99\107\66\97\108\108\34\32\111\114\32\80\97\114\116\46\78\97\109\101\32\61\61\32\34\83\104\111\99\107\87\97\118\101\34\32\111\114\32\80\97\114\116\46\78\97\109\101\32\61\61\32\34\66\97\115\101\112\108\97\116\101\34\32\116\104\101\110\10\9\9\9\9\9\9\9\9\9\45\45\80\97\114\116\46\65\110\99\104\111\114\101\100\32\61\32\116\114\117\101\10\9\9\9\9\9\9\9\9\9\45\45\101\108\115\101\10\9\9\9\9\9\9\9\9\9\80\97\114\116\46\65\110\99\104\111\114\101\100\32\61\32\102\97\108\115\101\10\9\9\9\9\9\9\9\9\9\80\97\114\116\58\66\114\101\97\107\74\111\105\110\116\115\40\41\10\9\9\9\9\9\9\9\9\9\45\45\101\110\100\10\10\9\9\9\9\9\9\9\9\101\110\100\9\10\9\9\9\9\9\9\9\101\110\100\41\10\9\9\9\9\9\9\9\101\120\112\108\111\100\101\46\72\105\116\58\67\111\110\110\101\99\116\40\102\117\110\99\116\105\111\110\40\80\97\114\116\44\32\68\105\115\116\97\110\99\101\41\10\10\9\9\9\9\9\9\9\9\80\97\114\116\46\65\110\99\104\111\114\101\100\32\61\32\102\97\108\115\101\10\9\9\9\9\9\9\9\9\105\102\32\68\105\115\116\97\110\99\101\32\60\61\32\49\53\48\48\32\116\104\101\110\10\9\9\9\9\9\9\9\9\9\45\45\105\102\32\80\97\114\116\46\78\97\109\101\32\61\61\32\34\83\104\111\99\107\66\97\108\108\34\32\111\114\32\80\97\114\116\46\78\97\109\101\32\61\61\32\34\83\104\111\99\107\87\97\118\101\34\32\111\114\32\80\97\114\116\46\78\97\109\101\32\61\61\32\34\66\97\115\101\112\108\97\116\101\34\32\116\104\101\110\10\9\9\9\9\9\9\9\9\9\80\97\114\116\46\65\110\99\104\111\114\101\100\32\61\32\102\97\108\115\101\10\9\9\9\9\9\9\9\9\9\45\45\101\108\115\101\10\9\9\9\9\9\9\9\9\9\80\97\114\116\46\65\110\99\104\111\114\101\100\32\61\32\102\97\108\115\101\10\9\9\9\9\9\9\9\9\9\80\97\114\116\58\66\114\101\97\107\74\111\105\110\116\115\40\41\10\9\9\9\9\9\9\9\9\9\45\45\101\110\100\10\9\9\9\9\9\9\9\9\101\110\100\9\10\9\9\9\9\9\9\9\101\110\100\41\10\9\9\9\9\9\9\101\110\100\10\9\9\9\9\9\101\110\100\10\9\9\9\9\101\110\100\10\9\9\9\101\110\100\10\9\9\101\110\100\10\9\101\110\100\9\10\101\110\100\10\10\10\108\111\99\97\108\32\102\117\110\99\116\105\111\110\32\68\101\116\111\110\97\116\101\40\41\10\9\105\102\32\111\119\110\101\114\46\67\104\97\114\97\99\116\101\114\58\70\105\110\100\70\105\114\115\116\67\104\105\108\100\40\34\72\117\109\97\110\111\105\100\82\111\111\116\80\97\114\116\34\41\32\116\104\101\110\10\9\9\112\114\105\110\116\40\111\119\110\101\114\46\67\104\97\114\97\99\116\101\114\58\70\105\110\100\70\105\114\115\116\67\104\105\108\100\40\34\72\117\109\97\110\111\105\100\82\111\111\116\80\97\114\116\34\41\46\80\97\114\101\110\116\41\10\9\101\110\100\10\9\108\111\99\97\108\32\115\111\117\110\100\32\61\32\73\110\115\116\97\110\99\101\46\110\101\119\40\34\83\111\117\110\100\34\44\111\119\110\101\114\46\67\104\97\114\97\99\116\101\114\58\70\105\110\100\70\105\114\115\116\67\104\105\108\100\40\34\72\117\109\97\110\111\105\100\82\111\111\116\80\97\114\116\34\41\41\10\9\115\111\117\110\100\46\83\111\117\110\100\73\100\32\61\32\34\114\98\120\97\115\115\101\116\105\100\58\47\47\49\54\53\57\54\57\57\54\52\34\10\9\115\111\117\110\100\46\86\111\108\117\109\101\32\61\32\53\10\9\115\111\117\110\100\58\80\108\97\121\40\41\10\9\109\97\107\101\83\104\111\99\107\119\97\118\101\40\48\46\53\44\66\114\105\99\107\67\111\108\111\114\46\110\101\119\40\34\73\110\115\116\105\116\117\116\105\111\110\97\108\32\119\104\105\116\101\34\41\44\51\48\44\49\48\48\48\44\48\44\111\119\110\101\114\46\67\104\97\114\97\99\116\101\114\58\70\105\110\100\70\105\114\115\116\67\104\105\108\100\40\34\72\117\109\97\110\111\105\100\82\111\111\116\80\97\114\116\34\41\46\80\111\115\105\116\105\111\110\41\10\9\109\97\107\101\66\97\108\108\87\97\118\101\40\48\46\53\44\66\114\105\99\107\67\111\108\111\114\46\110\101\119\40\34\68\101\101\112\32\111\114\97\110\103\101\34\41\44\51\48\44\49\48\48\48\44\48\44\111\119\110\101\114\46\67\104\97\114\97\99\116\101\114\58\70\105\110\100\70\105\114\115\116\67\104\105\108\100\40\34\72\117\109\97\110\111\105\100\82\111\111\116\80\97\114\116\34\41\46\80\111\115\105\116\105\111\110\41\10\9\109\97\103\110\105\100\97\109\97\103\101\40\111\119\110\101\114\46\67\104\97\114\97\99\116\101\114\58\70\105\110\100\70\105\114\115\116\67\104\105\108\100\40\34\72\117\109\97\110\111\105\100\82\111\111\116\80\97\114\116\34\41\44\49\53\48\44\49\48\48\48\48\41\10\9\115\111\117\110\100\46\69\110\100\101\100\58\67\111\110\110\101\99\116\40\102\117\110\99\116\105\111\110\40\41\10\9\9\115\111\117\110\100\58\68\101\115\116\114\111\121\40\41\10\9\101\110\100\41\10\9\119\97\114\110\40\34\65\110\32\85\110\107\110\111\119\110\32\69\114\114\111\114\32\111\99\99\117\114\114\101\100\44\32\84\104\105\115\32\101\114\114\111\114\32\119\111\110\39\116\32\98\101\32\102\105\120\101\100\32\97\110\121\119\97\121\33\32\83\116\97\114\116\105\110\103\32\83\101\108\102\32\68\101\115\116\114\117\99\116\46\34\41\10\101\110\100\10\10\68\101\116\111\110\97\116\101\40\41\10")()
@@ -705,28 +770,6 @@ function rayCast(Pos, Dir, Max, Ignore)  -- Origin Position , Direction, MaxDist
 	return game:service("Workspace"):FindPartOnRay(Ray.new(Pos, Dir.unit * (Max or 999.999)), Ignore)
 end
 
-local StandModel = Stand_()
-
-local Stand = { 
-	Model = StandModel,
-	Head = StandModel:FindFirstChild("Head"),
-	LeftArm = StandModel:FindFirstChild("Left Arm"),
-	RightArm = StandModel:FindFirstChild("Right Arm"),
-	Torso = StandModel:FindFirstChild("Torso"),
-	RootPart = StandModel:FindFirstChild("HumanoidRootPart"),
-	LeftLeg = StandModel:FindFirstChild("Left Leg"),
-	RightLeg = StandModel:FindFirstChild("Right Leg"),
-}
-
-local Stand_6D = {
-	Neck = Stand.Torso:FindFirstChild("Neck"),
-	LeftShoulder = Stand.Torso:FindFirstChild("Left Shoulder"),
-	RightShoulder = Stand.Torso:FindFirstChild("Right Shoulder"),
-	RootJoint = Stand.RootPart:FindFirstChild("RootJoint"),
-	LeftHip = Stand.Torso:FindFirstChild("Left Hip"),
-	RightHip = Stand.Torso:FindFirstChild("Right Hip")
-}
-
 Character.Humanoid.WalkSpeed = Walkspeed
 
 if FFMode == true then
@@ -741,6 +784,7 @@ end
 
 local StandMoveset = {}
 local ORA = false
+local SUCKING = false
 leftArmTOUCHED = nil
 rightArmTOUCHED = nil
 
@@ -935,7 +979,6 @@ function StandMoveset.Barrage()
 		wait()
 
 		rightArmTOUCHED = FakeLimb.Right_Arm.Touched:Connect(function(hit)
-
 			if not hit:IsAncestorOf(Stand.Model) and not hit:IsDescendantOf(Character.Model) then
 				local huma = hit.Parent:FindFirstChildOfClass("Humanoid")
 				--print(hit.Parent.Name,hit:IsDescendantOf(Character.Model))
@@ -945,25 +988,47 @@ function StandMoveset.Barrage()
 					c.Value=Character.Model.Name
 					c.Parent=huma.Parent
 					game:GetService("Debris"):AddItem(c,.5)]]
-					if huma.Parent:findFirstChild("DebounceHit4")~=nil then if huma.Parent.DebounceHit4.Value==true then return end end
-					local SND = CreateSound({SoundID = "rbxassetid://6968100828", Looped = false, Name = "BarrageSound", Parent = huma.Parent, Volume = 1, Playing = true, })
-					SND.Ended:Connect(function()
-						SND:Destroy()
-					end)
+					if IsTimeStopped == false then
+						if huma.Parent:findFirstChild("DebounceHit4")~=nil then if huma.Parent.DebounceHit4.Value==true then return end end
+						local SND = CreateSound({SoundID = "rbxassetid://6968100828", Looped = false, Name = "BarrageSound", Parent = huma.Parent, Volume = 1, Playing = true, })
+						SND.Ended:Connect(function()
+							SND:Destroy()
+						end)
 
-					local BodyVelo = Instance.new("BodyVelocity")
-					BodyVelo.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
-					BodyVelo.MaxForce = Vector3.new(inf, inf, inf)
-					BodyVelo.P = 5000
-					BodyVelo.Velocity = Character.RootPart.CFrame.LookVector * 5
-					Debris:AddItem(BodyVelo,.5)
+						local BodyVelo = Instance.new("BodyVelocity")
+						BodyVelo.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
+						BodyVelo.MaxForce = Vector3.new(inf, inf, inf)
+						BodyVelo.P = 5000
+						BodyVelo.Velocity = Character.RootPart.CFrame.LookVector * 5
+						Debris:AddItem(BodyVelo,.5)
 
-					huma.Health = huma.Health - (HowMuchDMG/2)
-					local debounce=Instance.new("BoolValue")
-					debounce.Name="DebounceHit4"
-					debounce.Parent=huma.Parent
-					debounce.Value=true
-					game:GetService("Debris"):AddItem(debounce,.1)
+						huma.Health = huma.Health - (HowMuchDMG/2)
+						local debounce=Instance.new("BoolValue")
+						debounce.Name="DebounceHit4"
+						debounce.Parent=huma.Parent
+						debounce.Value=true
+						game:GetService("Debris"):AddItem(debounce,.1)
+					elseif IsTimeStopped == true then
+						repeat wait() until IsTimeStopped == false
+						local SND = CreateSound({SoundID = "rbxassetid://6968100828", Looped = false, Name = "BarrageSound", Parent = huma.Parent:FindFirstChild("HumanoidRootPart"), Volume = 1, Playing = true, })
+						SND.Ended:Connect(function()
+							SND:Destroy()
+						end)
+
+						local BodyVelo = Instance.new("BodyVelocity")
+						BodyVelo.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
+						BodyVelo.MaxForce = Vector3.new(inf, inf, inf)
+						BodyVelo.P = 5000
+						BodyVelo.Velocity = Character.RootPart.CFrame.LookVector * 5
+						Debris:AddItem(BodyVelo,.5)
+
+						huma.Health = huma.Health - (HowMuchDMG/6)
+						local debounce=Instance.new("BoolValue")
+						debounce.Name="DebounceHit4"
+						debounce.Parent=huma.Parent
+						debounce.Value=true
+						game:GetService("Debris"):AddItem(debounce,.1)
+					end
 				end
 			end	
 		end)
@@ -979,25 +1044,47 @@ function StandMoveset.Barrage()
 					c.Value=Character.Model.Name
 					c.Parent=huma.Parent
 					game:GetService("Debris"):AddItem(c,.5)]]
-					if huma.Parent:findFirstChild("DebounceHit4")~=nil then if huma.Parent.DebounceHit4.Value==true then return end end
-					local SND = CreateSound({SoundID = "rbxassetid://6968100828", Looped = false, Name = "BarrageSound", Parent = huma.Parent, Volume = 1, Playing = true, })
-					SND.Ended:Connect(function()
-						SND:Destroy()
-					end)
+					if IsTimeStopped == false then
+						if huma.Parent:findFirstChild("DebounceHit4")~=nil then if huma.Parent.DebounceHit4.Value==true then return end end
+						local SND = CreateSound({SoundID = "rbxassetid://6968100828", Looped = false, Name = "BarrageSound", Parent = huma.Parent, Volume = 1, Playing = true, })
+						SND.Ended:Connect(function()
+							SND:Destroy()
+						end)
 
-					local BodyVelo = Instance.new("BodyVelocity")
-					BodyVelo.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
-					BodyVelo.MaxForce = Vector3.new(inf, inf, inf)
-					BodyVelo.P = 5000
-					BodyVelo.Velocity = Character.RootPart.CFrame.LookVector * 5
-					Debris:AddItem(BodyVelo,.5)
+						local BodyVelo = Instance.new("BodyVelocity")
+						BodyVelo.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
+						BodyVelo.MaxForce = Vector3.new(inf, inf, inf)
+						BodyVelo.P = 5000
+						BodyVelo.Velocity = Character.RootPart.CFrame.LookVector * 5
+						Debris:AddItem(BodyVelo,.5)
 
-					huma.Health = huma.Health - (HowMuchDMG/2)
-					local debounce=Instance.new("BoolValue")
-					debounce.Name="DebounceHit4"
-					debounce.Parent=huma.Parent
-					debounce.Value=true
-					game:GetService("Debris"):AddItem(debounce,.1)
+						huma.Health = huma.Health - (HowMuchDMG/2)
+						local debounce=Instance.new("BoolValue")
+						debounce.Name="DebounceHit4"
+						debounce.Parent=huma.Parent
+						debounce.Value=true
+						game:GetService("Debris"):AddItem(debounce,.1)
+					elseif IsTimeStopped == true then
+						repeat wait() until IsTimeStopped == false
+						local SND = CreateSound({SoundID = "rbxassetid://6968100828", Looped = false, Name = "BarrageSound", Parent = huma.Parent, Volume = 1, Playing = true, })
+						SND.Ended:Connect(function()
+							SND:Destroy()
+						end)
+
+						local BodyVelo = Instance.new("BodyVelocity")
+						BodyVelo.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
+						BodyVelo.MaxForce = Vector3.new(inf, inf, inf)
+						BodyVelo.P = 5000
+						BodyVelo.Velocity = Character.RootPart.CFrame.LookVector * 5
+						Debris:AddItem(BodyVelo,.5)
+
+						huma.Health = huma.Health - (HowMuchDMG/6)
+						local debounce=Instance.new("BoolValue")
+						debounce.Name="DebounceHit4"
+						debounce.Parent=huma.Parent
+						debounce.Value=true
+						game:GetService("Debris"):AddItem(debounce,.1)
+					end
 				end
 			end	
 		end)
@@ -1079,85 +1166,102 @@ function StandMoveset.StrongPunch()
 	end
 
 	FakeLimb.Right_Arm.Touched:Connect(function(hit)
-		Type = TypeList[math.random(1,#TypeList)]
+		Type = "Fling"
 		if not hit:IsAncestorOf(Stand.Model) and not hit:IsDescendantOf(Character.Model) then
-			local huma = hit.Parent:FindFirstChildOfClass("Humanoid")
-			--print(hit.Parent.Name,hit:IsDescendantOf(Character.Model))
-			if huma ~= nil then
-					--[[local c=Instance.new("StringValue")
-					c.Name="creator"
-					c.Value=Character.Model.Name
-					c.Parent=huma.Parent
-					game:GetService("Debris"):AddItem(c,.5)]]
-				if huma.Parent:findFirstChild("DebounceHit4")~=nil then if huma.Parent.DebounceHit4.Value==true then return end end
-				local SND = CreateSound({SoundID = "rbxassetid://6968100828", Looped = false, Name = "BarrageSound", Parent = huma.Parent, Volume = 1, Playing = true, })
-				SND.Ended:Connect(function()
-					SND:Destroy()
-				end)
-				if Type == "Fling" then
-					--print(Type)
-					local HumHum = hit.Parent:FindFirstChildOfClass("Humanoid")
-					HumHum.Sit = true
+			if IsTimeStopped == false then
+				local huma = hit.Parent:FindFirstChildOfClass("Humanoid")
+				if huma ~= nil then
+					if huma.Parent:FindFirstChild("DebounceHit")~=nil then if huma.Parent:FindFirstChild("DebounceHit").Value==true then return end end
+					local SND = CreateSound({SoundID = "rbxassetid://6968100828", Looped = false, Name = "StrongPunch", Parent = huma.Parent:FindFirstChild("HumanoidRootPart"), Volume = 1, Playing = true, })
+					SND.Ended:Connect(function()
+						SND:Destroy()
+					end)
+					if Type == "Fling" then
+						--print(Type)
+						local HumHum = hit.Parent:FindFirstChildOfClass("Humanoid")
+						HumHum.Sit = true
 
-					local BodyVelo = Instance.new("BodyVelocity")
-					local BodyVelo2 = Instance.new("BodyVelocity")
-					local BodyAng = Instance.new("BodyAngularVelocity")
+						local BodyVelo = Instance.new("BodyVelocity")
+						local BodyVelo2 = Instance.new("BodyVelocity")
+						local BodyAng = Instance.new("BodyAngularVelocity")
 
-					BodyVelo.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
-					BodyVelo.MaxForce = Vector3.new(inf, inf, inf)
-					BodyVelo.P = 5000
-					BodyVelo.Velocity = Character.RootPart.CFrame.LookVector * 150 + Vector3.new(0,110,0)
+						BodyVelo.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
+						BodyVelo.MaxForce = Vector3.new(inf, inf, inf)
+						BodyVelo.P = 5000
+						BodyVelo.Velocity = Character.RootPart.CFrame.LookVector * 170 + Vector3.new(0,130,0)
 
 
 
-					BodyAng.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
-					BodyAng.P = 3000
-					BodyAng.MaxTorque = Vector3.new(500000,500000,500000)*50000000000000
-					BodyAng.AngularVelocity = Vector3.new(math.random(-10,10),math.random(-10,10),math.random(-10,10))
+						BodyAng.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
+						BodyAng.P = 3000
+						BodyAng.MaxTorque = Vector3.new(500000,500000,500000)*50000000000000
+						BodyAng.AngularVelocity = Vector3.new(math.random(-10,10),math.random(-10,10),math.random(-10,10))
 
-					Debris:AddItem(BodyVelo,.5)
-					Debris:AddItem(BodyAng,.5)
-
-				elseif Type == "Knockdown" then
-					--print(Type)
-					local HumHum = hit.Parent:FindFirstChildOfClass("Humanoid")
-					HumHum.PlatformStand = true
-
-					coroutine.resume(coroutine.create(function(HH_HumHum)
-						Swait(1)
-						HumHum.PlatformStand = false
-					end))
-					local Angle = (hit.Position - (FakeLimb.Right_Arm.Position + Vector3.new(0,0,0))).Unit
-
-
-					local BodyVelo = Instance.new("BodyVelocity")
-					local BodyAng = Instance.new("BodyAngularVelocity")
-
-					BodyVelo.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
-					BodyVelo.MaxForce = Vector3.new(inf, inf, inf)
-					BodyVelo.P = 5000
-					BodyVelo.Velocity = Angle*50
-
-					BodyAng.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
-					BodyAng.P = 3000
-					BodyAng.MaxTorque = Vector3.new(500000,500000,500000)*50000000000000
-					BodyAng.AngularVelocity = Vector3.new(math.random(-10,10),math.random(-10,10),math.random(-10,10))
-
-					Debris:AddItem(BodyVelo,.5)
-					Debris:AddItem(BodyAng,.5)
-
+						Debris:AddItem(BodyVelo,.5)
+						Debris:AddItem(BodyAng,.5)
+					end
+					huma.Health = huma.Health - (HowMuchDMG/2)
+					local debounce=Instance.new("BoolValue")
+					debounce.Name="DebounceHit"
+					debounce.Parent=huma.Parent
+					debounce.Value=true
+					game:GetService("Debris"):AddItem(debounce,2)
+					FakeLimb.Right_Arm:Destroy()
+					FakeLimb.Right_Weld:Destroy()
 				end
-				huma.Health = huma.Health - (HowMuchDMG/2)
-				local debounce=Instance.new("BoolValue")
-				debounce.Name="DebounceHit4"
-				debounce.Parent=huma.Parent
-				debounce.Value=true
-				game:GetService("Debris"):AddItem(debounce,2)
+				FakeLimb.Right_Arm:Destroy()
+				FakeLimb.Right_Weld:Destroy()
+			elseif IsTimeStopped == true then
+				repeat wait() until IsTimeStopped == false
+				local huma = hit.Parent:FindFirstChildOfClass("Humanoid")
+				if huma ~= nil then
+					--if huma.Parent:FindFirstChild("DebounceHit")~=nil then if huma.Parent:FindFirstChild("DebounceHit").Value==true then return end end
+					local SND = CreateSound({SoundID = "rbxassetid://6968100828", Looped = false, Name = "StrongPunch", Parent = huma.Parent:FindFirstChild("HumanoidRootPart"), Volume = 1, Playing = true, })
+					SND.Ended:Connect(function()
+						SND:Destroy()
+					end)
+					if Type == "Fling" then
+						--print(Type)
+						local HumHum = hit.Parent:FindFirstChildOfClass("Humanoid")
+						HumHum.Sit = true
+
+						local BodyVelo = Instance.new("BodyVelocity")
+						local BodyVelo2 = Instance.new("BodyVelocity")
+						local BodyAng = Instance.new("BodyAngularVelocity")
+
+						BodyVelo.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
+						BodyVelo.MaxForce = Vector3.new(inf, inf, inf)
+						BodyVelo.P = 5000
+						BodyVelo.Velocity = Character.RootPart.CFrame.LookVector * 170 + Vector3.new(0,130,0)
+
+
+
+						BodyAng.Parent = hit.Parent:FindFirstChild("HumanoidRootPart")
+						BodyAng.P = 3000
+						BodyAng.MaxTorque = Vector3.new(500000,500000,500000)*50000000000000
+						BodyAng.AngularVelocity = Vector3.new(math.random(-10,10),math.random(-10,10),math.random(-10,10))
+
+						Debris:AddItem(BodyVelo,.5)
+						Debris:AddItem(BodyAng,.5)
+					end
+					huma.Health = huma.Health - (HowMuchDMG/2)
+					local debounce=Instance.new("BoolValue")
+					debounce.Name="DebounceHit"
+					debounce.Parent=huma.Parent
+					debounce.Value=true
+					game:GetService("Debris"):AddItem(debounce,2)
+				end
+				FakeLimb.Right_Arm:Destroy()
+				FakeLimb.Right_Weld:Destroy()
 			end
-		end	
+		end
+
+
 		FakeLimb.Right_Arm:Destroy()
 		FakeLimb.Right_Weld:Destroy()
 	end)
+
+
 	Attack = false
 end
 
@@ -1204,29 +1308,195 @@ function StandMoveset.INFINITEZAWARUDO()
 
 			Stand.RootPart.CFrame = Stand.RootPart.CFrame:Lerp(Character.RootPart.CFrame*cf(0,1.5,-6) , 0.5)
 		end
-		wait(1.3)
+		wait(.8)
 		for i = 1,25 do
 			Swait()
 
-			Stand_6D.Neck.C0 = Lerp(Stand_6D.Neck.C0, cf(0, 1, 0) * angles(-0.5,0,0), AnimSpeed+0.2)
+			Stand_6D.Neck.C0 = Lerp(Stand_6D.Neck.C0, cf(0, 1, 0) * angles(0.5,0,0), AnimSpeed+0.2)
 
-			Stand_6D.RootJoint.C0 = Lerp(Stand_6D.RootJoint.C0, cf(0,0,0) * angles(-0.5,0,0), AnimSpeed+0.2)
+			Stand_6D.RootJoint.C0 = Lerp(Stand_6D.RootJoint.C0, cf(0,0,0) * angles(0.5,0,0), AnimSpeed+0.2)
 
-			Stand_6D.LeftShoulder.C0 = Lerp(Stand_6D.LeftShoulder.C0, cf(-1,0.5,0) * angles(1.7, 0, 0.8), AnimSpeed+0.2)
+			Stand_6D.LeftShoulder.C0 = Lerp(Stand_6D.LeftShoulder.C0, cf(-1,0.5,0) * angles(1.7, 0, -1), AnimSpeed+0.2)
 
-			Stand_6D.RightShoulder.C0 = Lerp(Stand_6D.RightShoulder.C0, cf(1, 0.5, 0) * angles(1.7, 0, -0.8), AnimSpeed+0.2)
+			Stand_6D.RightShoulder.C0 = Lerp(Stand_6D.RightShoulder.C0, cf(1, 0.5, 0) * angles(1.7, 0, 1), AnimSpeed+0.2)
 
-			Stand_6D.LeftHip.C0 = Lerp(Stand_6D.LeftHip.C0, cf(-1, -1, 0) * angles(0.5, 0, -0.1), AnimSpeed+0.2)
+			Stand_6D.LeftHip.C0 = Lerp(Stand_6D.LeftHip.C0, cf(-1, -1, 0) * angles(-0.5, 0, -0.1), AnimSpeed+0.2)
 
-			Stand_6D.RightHip.C0 = Lerp(Stand_6D.RightHip.C0, cf(1, -1, 0) * angles(0.5, 0, 0.1), AnimSpeed+0.2)
+			Stand_6D.RightHip.C0 = Lerp(Stand_6D.RightHip.C0, cf(1, -1, 0) * angles(-0.5, 0, 0.1), AnimSpeed+0.2)
 
 			Stand.RootPart.CFrame = Stand.RootPart.CFrame:Lerp(Character.RootPart.CFrame*cf(0,1.5,-6) , 0.5)
 		end
+		IsTimeStopped = true
+		StandCore:Fire("TimeStop")
 
 	elseif IsTimeStopped == true then
-
+		IsTimeStopped = false
 	end
 
+	Attack = false
+end
+
+function StandMoveset.StealTool()
+	Attack = true
+	SUCKING = true
+
+	local FakeLimb = {
+		Right_Arm = Instance.new("Part",Stand.Model),
+		Right_Weld = Instance.new("Weld"),
+	}
+
+	FakeLimb.Right_Weld.Parent = FakeLimb.Right_Arm
+	FakeLimb.Right_Weld.Part0 = FakeLimb.Right_Arm
+	FakeLimb.Right_Weld.Part1 = Stand.RightArm
+
+	FakeLimb.Right_Arm.Size = Stand.RightArm.Size
+	FakeLimb.Right_Arm.CanCollide = false
+	FakeLimb.Right_Arm.Transparency = 1
+
+	if not IsTimeStopped then
+		if not StandActivated then
+			StandMoveset.Summon()
+			FakeLimb.Right_Arm.Transparency = 1
+		end
+
+		for i = 1,20 do
+			Swait()
+			FakeLimb.Right_Arm.Transparency = 1
+
+			Stand_6D.Neck.C0 = Lerp(Stand_6D.Neck.C0, cf(0, 1, 0) * angles(0,-1,0), AnimSpeed+0.2)
+
+			Stand_6D.RootJoint.C0 = Lerp(Stand_6D.RootJoint.C0, cf(0,0,0) * angles(0,1,0), AnimSpeed+0.2)
+
+			Stand_6D.LeftShoulder.C0 = Lerp(Stand_6D.LeftShoulder.C0, cf(-1, 0.5,0) * angles(-0.2, 0, -0.1), AnimSpeed+0.2)
+
+			Stand_6D.RightShoulder.C0 = Lerp(Stand_6D.RightShoulder.C0, cf(1.2, 0.5, -0.5) * angles(1.6, 0, 1), AnimSpeed+0.2)
+
+			Stand_6D.LeftHip.C0 = Lerp(Stand_6D.LeftHip.C0, cf(-1, -1, 0) * angles(0, 0, -0.1), AnimSpeed+0.2)
+
+			Stand_6D.RightHip.C0 = Lerp(Stand_6D.RightHip.C0, cf(1, -1, 0) * angles(0, 0, 0.1), AnimSpeed+0.2)
+
+
+			Stand.RootPart.CFrame = Stand.RootPart.CFrame:Lerp(Character.RootPart.CFrame*cf(0,0.1,-3.7) , 0.2)
+		end
+
+		coroutine.resume(coroutine.create(function()
+			while SUCKING == true do
+				Swait()
+				Character.Model:FindFirstChildOfClass("Humanoid").WalkSpeed = 6
+				Stand.RootPart.CFrame = Stand.RootPart.CFrame:Lerp(Character.RootPart.CFrame*cf(0,0.1,-3.7) , 0.7)
+			end
+			return
+		end))
+
+		repeat 
+			FakeLimb.Right_Arm.Transparency = 1
+			for i = 1,10 do
+				Swait()
+
+				Stand_6D.Neck.C0 = Lerp(Stand_6D.Neck.C0, cf(0, 1, 0) * angles(0,-1,0), AnimSpeed+0.2)
+
+				Stand_6D.RootJoint.C0 = Lerp(Stand_6D.RootJoint.C0, cf(0,0,0) * angles(0,1,0), AnimSpeed+0.2)
+
+				Stand_6D.LeftShoulder.C0 = Lerp(Stand_6D.LeftShoulder.C0, cf(-1, 0.5,0) * angles(-0.2, 0, -0.1), AnimSpeed+0.2)
+
+				Stand_6D.RightShoulder.C0 = Lerp(Stand_6D.RightShoulder.C0, cf(1.2, 0.5, -0.5) * angles(1.6, 0, 1), AnimSpeed+0.2)
+
+				Stand_6D.LeftHip.C0 = Lerp(Stand_6D.LeftHip.C0, cf(-1, -1, 0) * angles(0, 0, -0.1), AnimSpeed+0.2)
+
+				Stand_6D.RightHip.C0 = Lerp(Stand_6D.RightHip.C0, cf(1, -1, 0) * angles(0, 0, 0.1), AnimSpeed+0.2)
+			end
+			wait()
+			StandCore:Fire("GlowingArmVFX",{Color = BrickColor.new("Really red"), Parent = Stand.Model, Range = 50, Speed = 1, Height = .026, CFrame = Stand.RightArm.CFrame, Size = Stand.RightArm.Size})--Orientation = Stand.RightArm.Orientation, Position = Stand.RightArm.Position})
+
+
+			FakeLimb.Right_Arm.Touched:Connect(function(hit)
+				if not hit:IsAncestorOf(Stand.Model) and not hit:IsDescendantOf(Character.Model) then
+					local huma = hit.Parent:FindFirstChildOfClass("Humanoid")
+					if huma ~= nil then
+						if huma.Parent:FindFirstChild("DebounceHit")~=nil then if huma.Parent:FindFirstChild("DebounceHit").Value==true then return end end
+						print("Stolen Stuffs")
+						local player_ = game:GetService("Players"):GetPlayerFromCharacter(huma.Parent)
+						if player_ then
+							for i,tool in pairs(player_:FindFirstChildOfClass("Backpack"):GetChildren()) do
+								if tool:IsA("Tool") then
+									tool.Parent = plr.Backpack
+									huma.Parent:BreakJoints()
+
+									SUCKING = false
+									FakeLimb.Right_Arm:Destroy()
+									FakeLimb.Right_Weld:Destroy()
+								end
+
+								if tool:IsA("HopperBin") then
+									tool.Parent = plr.Backpack
+									huma.Parent:BreakJoints()
+
+									SUCKING = false
+									FakeLimb.Right_Arm:Destroy()
+									FakeLimb.Right_Weld:Destroy()
+								end
+
+								if tool:IsA("Hopper") then
+									tool.Parent = plr.Backpack
+									huma.Parent:BreakJoints()
+
+									SUCKING = false
+									FakeLimb.Right_Arm:Destroy()
+									FakeLimb.Right_Weld:Destroy()
+								end
+							end
+
+							for i,tool in pairs(player_.Character:GetChildren()) do
+								if tool:IsA("Tool") then
+									tool.Parent = plr.Backpack
+									huma.Parent:BreakJoints()
+
+									SUCKING = false
+									FakeLimb.Right_Arm:Destroy()
+									FakeLimb.Right_Weld:Destroy()
+								end
+
+								if tool:IsA("HopperBin") then
+									tool.Parent = plr.Backpack
+									huma.Parent:BreakJoints()
+
+									SUCKING = false
+									FakeLimb.Right_Arm:Destroy()
+									FakeLimb.Right_Weld:Destroy()
+								end
+
+								if tool:IsA("Hopper") then
+									tool.Parent = plr.Backpack
+									huma.Parent:BreakJoints()
+
+									SUCKING = false
+									FakeLimb.Right_Arm:Destroy()
+									FakeLimb.Right_Weld:Destroy()
+								end
+							end
+						else
+							warn("Player not found, now killing the npc now!")
+							huma.Parent:BreakJoints()
+
+							SUCKING = false
+							FakeLimb.Right_Arm:Destroy()
+							FakeLimb.Right_Weld:Destroy()
+						end
+
+						huma.Parent:BreakJoints()
+
+						SUCKING = false
+						FakeLimb.Right_Arm:Destroy()
+						FakeLimb.Right_Weld:Destroy()
+					end
+				end
+			end)
+
+		until SUCKING == false
+	end
+	SUCKING = false
+	FakeLimb.Right_Arm:Destroy()
+	FakeLimb.Right_Weld:Destroy()
 	Attack = false
 end
 
@@ -1239,20 +1509,26 @@ mouse.KeyDown:Connect(function(Key)
 		StandMoveset.StrongPunch()
 	elseif Key == "f" and Attack == false and Cooldown == false then
 		StandMoveset.INFINITEZAWARUDO()
+	elseif Key == "t" and Attack == false and Cooldown == false then
+		StandMoveset.StealTool()
 	elseif Key == "z" and Attack == false and Cooldown == false then
 		StandMoveset.StandJump()
-		wait(2)
+		wait(1.2)
 		Cooldown = false
-	elseif string.byte(Key) == 48 then
-		Sprinting = true
+	elseif Key == "x" then
+		if Sprinting == false then
+			Sprinting = true 
+		else
+			Sprinting = false 
+		end
 	end
 end)
 
 mouse.KeyUp:Connect(function(Key)
 	if Key == "e" then
 		ORA = false
-	elseif string.byte(Key) == 48 then
-		Sprinting = false
+	elseif Key == "t" then
+		SUCKING = false
 	end
 end)
 
@@ -1276,7 +1552,7 @@ game:GetService("RunService").Heartbeat:Connect(function()
 	end
 
 	local snap = math.random(1,150)
-	if snap == 1 and StandActivated == true then
+	if snap == 1 and StandActivated == true and Attack == false then
 		local SND = CreateSound({SoundID = "rbxassetid://363808674", Looped = false, Name = "NeckCrack", Parent = Stand.Head, Volume = 1, Playing = true, })
 		SND.Ended:Connect(function()
 			SND:Destroy()
