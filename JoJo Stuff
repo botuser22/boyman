@@ -1427,27 +1427,21 @@ function StandMoveset.StealTool()
 									tool.Parent = plr.Backpack
 									huma.Parent:BreakJoints()
 
-									SUCKING = false
-									FakeLimb.Right_Arm:Destroy()
-									FakeLimb.Right_Weld:Destroy()
+
 								end
 
 								if tool:IsA("HopperBin") then
 									tool.Parent = plr.Backpack
 									huma.Parent:BreakJoints()
 
-									SUCKING = false
-									FakeLimb.Right_Arm:Destroy()
-									FakeLimb.Right_Weld:Destroy()
+	
 								end
 
 								if tool:IsA("Hopper") then
 									tool.Parent = plr.Backpack
 									huma.Parent:BreakJoints()
 
-									SUCKING = false
-									FakeLimb.Right_Arm:Destroy()
-									FakeLimb.Right_Weld:Destroy()
+							
 								end
 							end
 
@@ -1456,27 +1450,21 @@ function StandMoveset.StealTool()
 									tool.Parent = plr.Backpack
 									huma.Parent:BreakJoints()
 
-									SUCKING = false
-									FakeLimb.Right_Arm:Destroy()
-									FakeLimb.Right_Weld:Destroy()
+									
 								end
 
 								if tool:IsA("HopperBin") then
 									tool.Parent = plr.Backpack
 									huma.Parent:BreakJoints()
 
-									SUCKING = false
-									FakeLimb.Right_Arm:Destroy()
-									FakeLimb.Right_Weld:Destroy()
+									
 								end
 
 								if tool:IsA("Hopper") then
 									tool.Parent = plr.Backpack
 									huma.Parent:BreakJoints()
 
-									SUCKING = false
-									FakeLimb.Right_Arm:Destroy()
-									FakeLimb.Right_Weld:Destroy()
+									
 								end
 							end
 						else
