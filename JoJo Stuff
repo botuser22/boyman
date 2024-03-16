@@ -1417,10 +1417,10 @@ function StandMoveset.StealTool()
 					if huma ~= nil then
 						if huma.Parent:FindFirstChild("DebounceHit")~=nil then if huma.Parent:FindFirstChild("DebounceHit").Value==true then return end end
 						print("Stolen Stuffs")
-						for i,player_ in pairs(game:GetService("Players"):GetPlayers()) do
-							if player_.Name == huma.Parent then
+						for i,player in pairs(game:GetService("Players"):GetPlayers()) do
+							if player.Name == huma.Parent then
 								if player_ then
-									for i,tool in pairs(player_:FindFirstChildOfClass("Backpack"):GetChildren()) do
+									for i,tool in pairs(player:FindFirstChildOfClass("Backpack"):GetChildren()) do
 										if tool:IsA("Tool") then
 											tool.Parent = plr.Backpack
 											huma.Parent:BreakJoints()
@@ -1449,7 +1449,7 @@ function StandMoveset.StealTool()
 										end
 									end
 
-									for i,tool in pairs(player_.Character:GetChildren()) do
+									for i,tool in pairs(player.Character:GetChildren()) do
 										if tool:IsA("Tool") then
 											tool.Parent = plr.Backpack
 											huma.Parent:BreakJoints()
