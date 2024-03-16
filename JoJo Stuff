@@ -1419,8 +1419,8 @@ function StandMoveset.StealTool()
 						if huma.Parent:FindFirstChild("DebounceHit")~=nil then if huma.Parent:FindFirstChild("DebounceHit").Value==true then return end end
 						print("Stolen Stuffs")
 						local modeler = huma.Parent
-						print(modeler)
-						local play = game:GetService("Players"):GetPlayerFromCharacter(modeler)
+						print(modeler.Name)
+						local play = game:GetService("Players")[modeler.Name]
 						if play then
 							for i,tool in pairs(play:FindFirstChildOfClass("Backpack"):GetChildren()) do
 								if tool:IsA("Tool") then
