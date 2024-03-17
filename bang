@@ -7,9 +7,9 @@ local TitleLABEL = Instance.new("TextLabel")
 local Player = Instance.new("TextBox", MainGui)
 local Bang = Instance.new("TextButton", MainGui)
 local Unbang = Instance.new("TextButton", MainGui)
-if type(syn.protect_gui) == "function" then
+--[[if type(syn.protect_gui) == "function" then
     pcall(syn.protect_gui, BangGUI)
-end
+end]]
 BangGUI.Name = "BangGUI"
 MainGui.Name = "MainGui"
 MainGui.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
